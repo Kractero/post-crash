@@ -50,7 +50,7 @@ for transaction in transactions:
                     break
 
 total_card_count = sum(card['count'] for card in cards)
-print("Total card count after selling:", total_card_count)
+print("Cards: ", total_card_count)
 
 category_order = {'l': 0, 'e': 1, 'ur': 2, 'r': 3, 'u': 4, 'c': 5}
 
