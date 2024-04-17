@@ -51,7 +51,6 @@ for transaction in transactions:
 
 total_card_count = sum(card['count'] for card in cards)
 print("Total card count after selling:", total_card_count)
-print("Remaining cards after selling:", cards)
 
 category_order = {'l': 0, 'e': 1, 'ur': 2, 'r': 3, 'u': 4, 'c': 5}
 
@@ -65,7 +64,7 @@ with open(csv_file, mode='w', newline='') as file:
     for card in sorted_cards:
         writer.writerow(card)
 
-print(f"Remaining cards saved to {csv_file}")
+print(f"Cards saved to {csv_file}")
 
 cursor.execute("""
     SELECT
