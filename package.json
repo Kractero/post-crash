@@ -1,7 +1,0 @@
-{
-    "dependencies": {
-      "better-sqlite3": "^9.5.0"
-    },
-    "type": "module"
-  }
-  
