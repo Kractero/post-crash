@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <form id="searchForm">
+      <input value="" id="nation" placeholder="" />
+      <button type="submit">Search Records</button>
+    </form>
+    <div class="content">
+      <h2 id="bank"></h2>
+      <div class="categoryseasoncounter"></div>
+      <div class="cards"></div>
+    </div>
+    <script>
+      document
+        .getElementById("searchForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const nation = document
+            .getElementById("nation")
+            .value.toLowerCase()
+            .replaceAll(" ", "_");
+
+          try {
+            const response = await fetch(
+              "https://bazaar.kractero.com/records/" + nation
+            );
+            if (response.ok) {
+              const jsonData = await response.json();
+              const cards = jsonData.cards;
+              const categoryCounts = {
+                l: 0,
+                e: 0,
+                ur: 0,
+                r: 0,
+                u: 0,
+                c: 0
+              };
+
+              const seasonCounts = {
+                1: 0,
+                2: 0,
+                3: 0
+              };
+
+              const map = {
+                l: "Legendary",
+                e: "Epic",
+                ur: "Ultra-Rare",
+                r: "Rare",
+                u: "Uncommon",
+                c: "Common"
+              };
+
+              cards.forEach((card) => {
+                categoryCounts[card.category] += card.count;
+                seasonCounts[card.season] += card.count;
+              });
+
+              document.getElementById("bank").textContent =
+                "Bank: " + jsonData.bank.toFixed(0);
+
+              const seasonDiv = document.querySelector(
+                ".categoryseasoncounter"
+              );
+
+              Object.keys(categoryCounts).forEach((category) => {
+                const quantityDiv = document.createElement("div");
+                quantityDiv.classList.add("quantity", category);
+                const count = categoryCounts[category];
+                quantityDiv.textContent = `${count} | ${map[category]}`;
+                quantityDiv.setAttribute("data-category", category);
+                quantityDiv.addEventListener("click", toggleCategorySelection);
+                seasonDiv.appendChild(quantityDiv);
+              });
+
+              Object.keys(seasonCounts).forEach((season, i) => {
+                const count = seasonCounts[season];
+                const seasonClass = "season" + season;
+                const quantityDiv = document.createElement("div");
+                quantityDiv.classList.add("quantity", seasonClass);
+                quantityDiv.textContent = `${count} | S${i + 1}`;
+                quantityDiv.setAttribute("data-season", season);
+                quantityDiv.addEventListener("click", toggleSeasonSelection);
+                seasonDiv.appendChild(quantityDiv);
+              });
+
+              const cardsDiv = document.querySelector(".cards");
+              cardsDiv.innerHTML = "";
+
+              cards.forEach((card) => {
+                const { category, season, card_name, count } = card;
+                const rarity = map[category];
+                const cardElement = document.createElement("p");
+                cardElement.textContent = `${count}x S${season} ${rarity} ${card_name}`;
+                cardElement.setAttribute("data-category", category);
+                cardElement.setAttribute("data-season", season);
+                cardsDiv.appendChild(cardElement);
+              });
+
+              showAllCards();
+            } else {
+              alert("Error: " + response.status);
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            alert("An error occurred. Please try again later.");
+          }
+        });
+      let activeFilters = {
+        category: [],
+        season: []
+      };
+
+      function toggleCategorySelection(event) {
+        const category = event.target.getAttribute("data-category");
+        const selected = event.target.classList.toggle("selected");
+        if (selected) {
+          activeFilters.category.push(category);
+        } else {
+          const index = activeFilters.category.indexOf(category);
+          if (index !== -1) {
+            activeFilters.category.splice(index, 1);
+          }
+        }
+        filterCards();
+      }
+
+      function toggleSeasonSelection(event) {
+        const season = event.target.getAttribute("data-season");
+        const selected = event.target.classList.toggle("selected");
+        if (selected) {
+          activeFilters.season.push(season);
+        } else {
+          const index = activeFilters.season.indexOf(season);
+          if (index !== -1) {
+            activeFilters.season.splice(index, 1);
+          }
+        }
+        filterCards();
+      }
+
+      function filterCards() {
+        const cards = document.querySelectorAll(".cards p");
+        cards.forEach((card) => {
+          const cardCategory = card.getAttribute("data-category");
+          const cardSeason = card.getAttribute("data-season");
+          const categoryMatch =
+            activeFilters.category.length === 0 ||
+            activeFilters.category.includes(cardCategory);
+          const seasonMatch =
+            activeFilters.season.length === 0 ||
+            activeFilters.season.includes(cardSeason);
+          card.style.display = categoryMatch && seasonMatch ? "block" : "none";
+        });
+      }
+
+      function showAllCards() {
+        const cards = document.querySelectorAll(".cards p");
+        cards.forEach((card) => {
+          card.style.display = "block";
+        });
+      }
+    </script>
+  </body>
+</html>
