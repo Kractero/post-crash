@@ -23,31 +23,34 @@ for transaction in transactions:
 
     traders[buyer]["bank"] -= price
 
-    if card_id in traders[buyer]["cards"]:
-        traders[buyer]["cards"][card_id]["count"] += 1
-    else:
+    if card_id not in traders[buyer]["cards"]:
         traders[buyer]["cards"][card_id] = {
-            "category": category, 
-            "season": season, 
-            "card_name": card_name, 
+            "card_name": card_name,
+            "category": category,
+            "seasons": {}
+        }
+
+    if season not in traders[buyer]["cards"][card_id]["seasons"]:
+        traders[buyer]["cards"][card_id]["seasons"][season] = {
             "count": 1
         }
+    else:
+        traders[buyer]["cards"][card_id]["seasons"][season]["count"] += 1
 
     if seller not in traders:
         traders[seller] = {"bank": 0, "cards": {}}
 
-    if card_id in traders[seller]["cards"]:
-        traders[seller]["cards"][card_id]["count"] -= 1
-
-        if traders[seller]["cards"][card_id]["count"] == 0:
-            del traders[seller]["cards"][card_id]
-    else:
+    if card_id not in traders[seller]["cards"]:
         traders[seller]["cards"][card_id] = {
-            "category": category, 
-            "season": season, 
-            "card_name": card_name, 
-            "count": -1
+            "card_name": card_name,
+            "category": category,
+            "seasons": {}
         }
+
+    if season not in traders[seller]["cards"][card_id]["seasons"]:
+        traders[seller]["cards"][card_id]["seasons"][season] = {"count": -1}
+    else:
+        traders[seller]["cards"][card_id]["seasons"][season]["count"] -= 1
 
     if price > 10:
         traders[seller]["bank"] += price - (price - 10) * 0.1
@@ -55,9 +58,16 @@ for transaction in transactions:
         traders[seller]["bank"] += price
 
 for trader in traders.values():
+    for card in trader["cards"].values():
+        card["seasons"] = {season: data for season, data in card["seasons"].items() if data["count"] > 0}
+        total_count = sum(season["count"] for season in card["seasons"].values())
+        card["count"] = total_count
+
     trader["cards"] = [card for card in trader["cards"].values() if card["count"] > 0]
+
     category_order = {'l': 0, 'e': 1, 'ur': 2, 'r': 3, 'u': 4, 'c': 5}
     trader["cards"] = sorted(trader["cards"], key=lambda x: (category_order.get(x['category']), -x["count"]))
+
 
 for trader in traders.values():
     trader["bank"] = max(trader["bank"], 0)
