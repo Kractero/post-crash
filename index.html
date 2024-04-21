@@ -9,8 +9,24 @@
   <body>
     <form id="searchForm">
       <input value="" id="nation" placeholder="" />
-      <button type="submit">Search Records</button>
+      <button id="submitter" type="submit">Search Records</button>
     </form>
+    <h1>View Record Data for <span id="nationName">Nation</span></h1>
+    <p>
+      Shows the net gain of cards between May 11th and April 11th, and the net
+      positive change in bank.
+    </p>
+    <ul>
+      <li>Cards junked do not factor into the bank</li>
+      <li>
+        Cards that were gifed to a nation with the express purpose of junking it
+        to be able to gift a card are included as gained.
+      </li>
+      <li>
+        Cards pulled on a nation are obviously not included, pulls are not a
+        part of trade records.
+      </li>
+    </ul>
     <div class="content">
       <h2 id="bank"></h2>
       <div class="categoryseasoncounter"></div>
@@ -22,12 +38,14 @@
         .addEventListener("submit", async function (event) {
           event.preventDefault();
 
+          document.querySelector("#nationName").textContent =
+            document.getElementById("nation").value;
+
           const nation = document
             .getElementById("nation")
             .value.toLowerCase()
             .replaceAll(" ", "_");
 
-          try {
             const response = await fetch(
               "https://bazaar.kractero.com/records/" + nation
             );
@@ -108,10 +126,6 @@
             } else {
               alert("Error: " + response.status);
             }
-          } catch (error) {
-            console.error("Error:", error);
-            alert("An error occurred. Please try again later.");
-          }
         });
       let activeFilters = {
         category: [],
