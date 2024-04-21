@@ -31,20 +31,24 @@
       <h2 id="bank"></h2>
       <div class="categoryseasoncounter"></div>
       <div class="cards"></div>
+      <p class="error"></p>
     </div>
     <script>
       document
         .getElementById("searchForm")
         .addEventListener("submit", async function (event) {
-          event.preventDefault();
+          try {
+            event.preventDefault();
+            document.querySelector('.cards').innerHTML = ""
+            document.querySelector('.error').textContent = ""
 
-          document.querySelector("#nationName").textContent =
-            document.getElementById("nation").value;
+            document.querySelector("#nationName").textContent =
+              document.getElementById("nation").value;
 
-          const nation = document
-            .getElementById("nation")
-            .value.toLowerCase()
-            .replaceAll(" ", "_");
+            const nation = document
+              .getElementById("nation")
+              .value.toLowerCase()
+              .replaceAll(" ", "_");
 
             const response = await fetch(
               "https://bazaar.kractero.com/records/" + nation
@@ -124,8 +128,11 @@
 
               showAllCards();
             } else {
-              alert("Error: " + response.status);
+              document.querySelector('.error').textContent = `Error: No records found for ${nation}`
             }
+          } catch (error) {
+            document.querySelector('.error').textContent = "An error occurred. Please try again later.";
+          }
         });
       let activeFilters = {
         category: [],

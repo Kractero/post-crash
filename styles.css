@@ -62,7 +62,8 @@ form button {
   padding: 0.25rem;
 }
 .selected {
-  font-weight: bold;
+  font-weight: bolder;
+  opacity: 0.5;
 }
 .l {
   background-color: rgb(231, 200, 32);
