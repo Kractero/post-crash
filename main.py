@@ -26,12 +26,12 @@ for transaction in transactions:
     if card_id not in traders[buyer]["cards"]:
         traders[buyer]["cards"][card_id] = {
             "card_name": card_name,
-            "category": category,
             "seasons": {}
         }
 
     if season not in traders[buyer]["cards"][card_id]["seasons"]:
         traders[buyer]["cards"][card_id]["seasons"][season] = {
+            "category": category,
             "count": 1
         }
     else:
@@ -43,12 +43,14 @@ for transaction in transactions:
     if card_id not in traders[seller]["cards"]:
         traders[seller]["cards"][card_id] = {
             "card_name": card_name,
-            "category": category,
             "seasons": {}
         }
 
     if season not in traders[seller]["cards"][card_id]["seasons"]:
-        traders[seller]["cards"][card_id]["seasons"][season] = {"count": -1}
+        traders[seller]["cards"][card_id]["seasons"][season] = {
+            "category": category,
+            "count": -1
+        }
     else:
         traders[seller]["cards"][card_id]["seasons"][season]["count"] -= 1
 
@@ -66,7 +68,7 @@ for trader in traders.values():
     trader["cards"] = [card for card in trader["cards"].values() if card["count"] > 0]
 
     category_order = {'l': 0, 'e': 1, 'ur': 2, 'r': 3, 'u': 4, 'c': 5}
-    trader["cards"] = sorted(trader["cards"], key=lambda x: (category_order.get(x['category']), -x["count"]))
+    # trader["cards"] = sorted(trader["cards"], key=lambda x: (category_order.get(x['category']), -x["count"]))
 
 
 for trader in traders.values():

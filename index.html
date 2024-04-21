@@ -86,7 +86,7 @@
                     return {
                       card_name: card.card_name,
                       season: season,
-                      category: card.category,
+                      category: card.seasons[season].category,
                       count: card.seasons[season].count
                     };
                   });
